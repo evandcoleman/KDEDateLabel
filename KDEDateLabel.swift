@@ -26,10 +26,6 @@ fileprivate class KDEWeakReferencer<T: NSObject>: NSObject {
     override var hash: Int {
         return value?.hash ?? 0
     }
-
-    override var hashValue: Int {
-        return value?.hashValue ?? 0
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +51,7 @@ fileprivate class KDEDateLabelsHolder: NSObject {
     }
 
     func removeReferencer(_ referencer: KDEWeakReferencer<KDEDateLabel>) {
-        if let index = self.dateLabels.index(of: referencer) {
+        if let index = self.dateLabels.firstIndex(of: referencer) {
             self.dateLabels.remove(at: index)
         }
         self.dateLabels = self.dateLabels.filter { $0.value != nil }
@@ -70,7 +66,7 @@ fileprivate class KDEDateLabelsHolder: NSObject {
             selector: #selector(KDEDateLabelsHolder.timerTicked(_:)),
             userInfo: nil,
             repeats: true)
-        RunLoop.main.add(self.timer!, forMode: .commonModes)
+        RunLoop.main.add(self.timer!, forMode: RunLoop.Mode.common)
     }
 
 
@@ -119,7 +115,7 @@ open class KDEDateLabel: UILabel {
 
 
     // MARK: Configuration
-    open static var refreshFrequency: TimeInterval = 0.2 {
+    public static var refreshFrequency: TimeInterval = 0.2 {
         didSet {
             KDEDateLabelsHolder.instance.createNewTimer()
         }
